@@ -76,8 +76,6 @@ const main = async () => {
                 { name: 'Download Messages/Posts', value: 'downloadMessages' },
                 { name: 'Get Admin Channels', value: 'getAdminChannels' },
                 { name: 'Download Channel Subscribers', value: 'getSubscribers' },
-                { name: 'Get Subscriber Profile', value: 'getSubscriber' },
-                { name: 'Get Channel Stats', value: 'getStats' },
             ],
             default: 'downloadMessages',
             message: 'What do you want to do?',
