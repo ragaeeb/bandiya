@@ -1,6 +1,6 @@
 # bandiya
 
-[![wakatime](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/768b1cff-d2bb-40e8-ae88-17b6d0edea89.svg)](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/768b1cff-d2bb-40e8-ae88-17b6d0edea89)
+[![wakatime](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/a5ab6f48-d46c-4401-b8b9-4d7bf08d32b6.svg)](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/a5ab6f48-d46c-4401-b8b9-4d7bf08d32b6)
 [![codecov](https://codecov.io/gh/ragaeeb/bandiya/graph/badge.svg?token=EENNAX5OJR)](https://codecov.io/gh/ragaeeb/bandiya)
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/ragaeeb/bandiya?utm_source=oss&utm_medium=github&utm_campaign=ragaeeb%2Fbandiya&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 [![Node.js CI](https://github.com/ragaeeb/bandiya/actions/workflows/build.yml/badge.svg)](https://github.com/ragaeeb/bandiya/actions/workflows/build.yml)
