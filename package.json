@@ -6,7 +6,7 @@
     "main": "dist/main.js",
     "type": "module",
     "bin": {
-        "bandiya": "./dist/index.js"
+        "bandiya": "dist/index.js"
     },
     "scripts": {
         "start": "bun run src/index.ts",
