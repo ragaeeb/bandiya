@@ -4,6 +4,7 @@ import welcome from 'cli-welcome';
 import Conf from 'conf';
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions';
+import { Api } from 'telegram/tl';
 
 import packageJson from '../package.json' assert { type: 'json' };
 import { downloadMessages } from './actions/downloadMessages.js';
@@ -76,6 +77,7 @@ const main = async () => {
                 { name: 'Download Messages/Posts', value: 'downloadMessages' },
                 { name: 'Get Admin Channels', value: 'getAdminChannels' },
                 { name: 'Download Channel Subscribers', value: 'getSubscribers' },
+                { name: 'Log Out', value: 'logout' },
             ],
             default: 'downloadMessages',
             message: 'What do you want to do?',
@@ -92,6 +94,11 @@ const main = async () => {
             logger.info('Fetching subscribers for channel...');
             const outputFile = await downloadSubscribers(client);
             logger.info(`Saved to ${outputFile}.`);
+        } else if (action === 'logout') {
+            logger.info('Logging out...');
+            await client.invoke(new Api.auth.LogOut());
+            config.delete('sessionId');
+            logger.info(`Logged out!`);
         }
     } catch (err) {
         logger.error(err);
