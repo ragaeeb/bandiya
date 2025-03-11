@@ -1,10 +1,13 @@
 {
     "name": "bandiya",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "CLI for interacting with Telegram platform.",
     "source": "src/index.ts",
     "main": "dist/main.js",
     "type": "module",
+    "bin": {
+        "bandiya": "./dist/index.js"
+    },
     "scripts": {
         "start": "bun run src/index.ts",
         "build": "NODE_ENV=production bun build src/index.ts --outdir dist --target node --packages=external",
