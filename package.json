@@ -10,8 +10,10 @@
     },
     "scripts": {
         "start": "bun run src/index.ts",
+        "migrate": "bun run src/actions/migrateToTopics/migrate.ts",
         "build": "NODE_ENV=production bun build src/index.ts --outdir dist --target node --packages=external",
-        "compile": "NODE_ENV=production bun build src/index.ts --target node --compile --outfile dist/bandiya"
+        "compile": "NODE_ENV=production bun build src/index.ts --target node --compile --outfile dist/bandiya",
+        "test": "bun test --coverage"
     },
     "files": [
         "dist/index.js",
@@ -25,26 +27,28 @@
     "author": "Ragaeeb Haq",
     "license": "MIT",
     "dependencies": {
-        "@inquirer/prompts": "^7.3.3",
+        "@inquirer/prompts": "^7.4.0",
         "cli-welcome": "^3.0.1",
         "conf": "^13.1.0",
         "pino": "^9.6.0",
         "pino-pretty": "^13.0.0",
+        "redis": "^4.7.0",
         "telegram": "^2.26.22"
     },
     "engines": {
         "bun": ">=1.0.40"
     },
     "devDependencies": {
-        "@eslint/js": "^9.22.0",
-        "@types/node": "^22.13.10",
-        "eslint": "^9.22.0",
+        "@eslint/js": "^9.23.0",
+        "@types/bun": "^1.2.6",
+        "@types/node": "^22.13.13",
+        "eslint": "^9.23.0",
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-perfectionist": "^4.10.1",
-        "eslint-plugin-prettier": "^5.2.3",
+        "eslint-plugin-prettier": "^5.2.4",
         "globals": "^16.0.0",
         "prettier": "^3.5.3",
         "semantic-release": "^24.2.3",
-        "typescript-eslint": "^8.26.1"
+        "typescript-eslint": "^8.28.0"
     }
 }
