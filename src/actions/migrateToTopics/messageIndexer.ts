@@ -34,6 +34,10 @@ export const indexTelegramMessagesById = (messages: TelegramMessage[]) => {
             newMessage.media = { photo: { id: message.media.photo.id } };
         }
 
+        if (message.media?.document?.id) {
+            newMessage.media = { document: { id: message.media.document.id } };
+        }
+
         if (message.replyTo) {
             const replyTo: any = {};
 

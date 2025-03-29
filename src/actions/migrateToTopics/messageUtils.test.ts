@@ -3,7 +3,9 @@ import { beforeAll, describe, expect, it } from 'bun:test';
 import {
     isForwardedFromChannel,
     isMessageFromAdmin,
+    isMessageFromBot,
     isMessageFromTopics,
+    isMessageFromUnknownUser,
     isMessageFromUser,
     isRelevantMessage,
     isSoliloquy,
@@ -41,13 +43,21 @@ describe('messageUtils', () => {
             expect(isMessageFromUser({ fwdFrom: { fromId: '11' } } as unknown as TelegramMessage)).toBeTrue();
         });
 
-        it('should accept messages forwarded from unknown users', () => {
-            expect(isMessageFromUser({ fwdFrom: { fromName: 'R' } } as unknown as TelegramMessage)).toBeTrue();
-        });
-
         it.skip('should show only messages from users', () => {
             const actual = messages.filter(isMessageFromUser);
             console.log('actual', actual);
+        });
+    });
+
+    describe('isMessageFromUnknownUser', () => {
+        it('should accept messages forwarded from unknown users', () => {
+            expect(isMessageFromUnknownUser({ fwdFrom: { fromName: 'R' } } as unknown as TelegramMessage)).toBeTrue();
+        });
+
+        it('should reject messages from known users', () => {
+            expect(
+                isMessageFromUnknownUser({ fwdFrom: { fromId: '11', fromName: 'R' } } as unknown as TelegramMessage),
+            ).toBeFalse();
         });
     });
 
@@ -135,8 +145,38 @@ describe('messageUtils', () => {
             ).toBeFalse();
         });
 
-        it.only('should show only channel forwards', () => {
+        it.skip('should show only channel forwards', () => {
             const actual = messages.filter(isForwardedFromChannel);
+            console.log('actual', actual);
+        });
+    });
+
+    describe('isMessageFromBot', () => {
+        it('should skip messages not in the bot list', () => {
+            expect(
+                isMessageFromBot({ fromId: { userId: '2' } } as unknown as TelegramMessage, new Set(['1'])),
+            ).toBeFalse();
+        });
+
+        it('should skip messages that have no fromId', () => {
+            expect(isMessageFromBot({} as unknown as TelegramMessage, new Set(['1']))).toBeFalse();
+        });
+
+        it('should accept message from a bot', () => {
+            expect(
+                isMessageFromBot({ fromId: { userId: '1' } } as unknown as TelegramMessage, new Set(['1'])),
+            ).toBeTrue();
+        });
+
+        it.skip('should show only messages from bots', () => {
+            const admins = new Set([process.env.BOT_ID as string]);
+            const actual = messages.filter((m) => isMessageFromBot(m, admins));
+            console.log('actual', actual);
+        });
+
+        it.skip('should show only messages from non-bots', () => {
+            const admins = new Set([process.env.BOT_ID as string]);
+            const actual = messages.filter((m) => !isMessageFromBot(m, admins));
             console.log('actual', actual);
         });
     });

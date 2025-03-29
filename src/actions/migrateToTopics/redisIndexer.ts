@@ -15,22 +15,18 @@ const getValidLegacyKeys = (cache: RedisCache) => {
         .filter((key) => cache[key].split('/').length > 2);
 };
 
-export const indexUsernamesById = (cache: RedisCache) => {
-    const userIdToUsernames: Record<string, string[]> = {};
+export const indexIdsByUsername = (cache: RedisCache) => {
+    const usernameToUserId: Record<string, string> = {};
 
     for (const key of getValidLegacyKeys(cache)) {
         const [, , userId, username] = cache[key].split('/');
 
         if (username) {
-            userIdToUsernames[userId] = (userIdToUsernames[userId] || []).concat(username);
+            usernameToUserId[username] = userId;
         }
     }
 
-    for (const key of Object.keys(userIdToUsernames)) {
-        userIdToUsernames[key] = Array.from(new Set(userIdToUsernames[key])); // remove duplicate usernames
-    }
-
-    return userIdToUsernames;
+    return usernameToUserId;
 };
 
 export const indexLegacyMessagesToUserId = (cache: RedisCache) => {
@@ -69,6 +65,6 @@ export const getIndexedDataFromCache = (cache: RedisCache) => {
     return {
         messageIdToUserId: indexLegacyMessagesToUserId(cache),
         threadIdToUser: indexCacheUsersByThread(cache),
-        userIdToUsernames: indexUsernamesById(cache),
+        usernameToUserId: indexIdsByUsername(cache),
     };
 };

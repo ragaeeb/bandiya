@@ -1,35 +1,20 @@
-import process from 'node:process';
+import { indexMessagesByTopicId, loadMessages, processMessagesFromLegacyGroup } from './mapping.js';
+import { isMessageFromTopics } from './messageUtils.js';
+import { getIndexedDataFromCache } from './redisIndexer.js';
+import { indexThreadsByUser, loadTopics } from './threadIndexer.js';
 
-import { mapTelegramMessagesToThread } from './mapping.js';
-import { indexTelegramMessagesById } from './messageIndexer.js';
-import { isRelevantMessage } from './messageUtils.js';
-import { indexThreadsById, indexThreadsByUser } from './threadIndexer.js';
-import { TelegramMessage } from './types.js';
+const { messageIdToUserId } = await getIndexedDataFromCache(await Bun.file('test/redis.json').json());
+const relevantMessages = await loadMessages('test/allMessages.json', messageIdToUserId);
+const threadIdToMessages = indexMessagesByTopicId(relevantMessages.filter(isMessageFromTopics));
 
-type MigrateProps = {
-    adminId: string;
-    botId: string;
-    messagesFile: string;
-    redisCacheFile: string;
-    topicsFile: string;
-};
+const threads = await loadTopics('test/allTopics.json', threadIdToMessages);
+const userIdToThread = processMessagesFromLegacyGroup(
+    relevantMessages.filter((m) => !isMessageFromTopics(m)),
+    indexThreadsByUser(threads),
+);
 
-const migrate = async (props: MigrateProps) => {
-    const idToThread = indexThreadsById(await Bun.file(props.topicsFile).json());
-    const userIdToThread = indexThreadsByUser(Object.values(idToThread));
-    const idToTelegramMessage: Record<string, TelegramMessage> = indexTelegramMessagesById(
-        await Bun.file(props.messagesFile).json(),
-    );
-    const messages = Object.values(idToTelegramMessage).filter(isRelevantMessage);
-    const messagesFromUser = messages.filter();
-};
-
-mapTelegramMessagesToThread({
-    adminIds: new Set([process.env.ADMIN_ID!]),
-    botIds: new Set([process.env.BOT_ID!]),
-    idToTelegramMessage,
-    idToThread,
-    userIdToThread,
+Object.values(userIdToThread).forEach((thread) => {
+    thread.messages.sort((a, b) => a.timestamp - b.timestamp);
 });
 
-console.log('idToTelegramMessage', Object.values(userIdToThread));
+await Bun.write('output.json', JSON.stringify(userIdToThread, null, 2));

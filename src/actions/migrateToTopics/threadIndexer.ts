@@ -1,18 +1,19 @@
-import { TelegramForumTopic, Thread } from './types.js';
+import { Message, TelegramForumTopic, Thread } from './types.js';
 
-export const indexThreadsById = (topics: TelegramForumTopic[]) => {
-    const idToThread: Record<string, Thread> = {};
-
-    for (const topic of topics) {
-        const thread: Thread = {
-            id: topic.id,
-            messages: [],
-            title: topic.title,
+export const loadTopics = async (
+    topicsFile: string,
+    threadIdToMessages: Record<string, Message[]>,
+): Promise<Thread[]> => {
+    const topics = (await Bun.file(topicsFile).json()) as TelegramForumTopic[];
+    const threads = topics.map(({ id, title }) => {
+        return {
+            id,
+            messages: threadIdToMessages[id] || [],
+            title,
         };
-        idToThread[thread.id] = thread;
-    }
+    });
 
-    return idToThread;
+    return threads;
 };
 
 export const indexThreadsByUser = (threads: Thread[]) => {

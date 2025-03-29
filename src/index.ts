@@ -2,6 +2,7 @@
 import { input, select } from '@inquirer/prompts';
 import welcome from 'cli-welcome';
 import Conf from 'conf';
+import process from 'node:process';
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions';
 import { Api } from 'telegram/tl';
@@ -10,6 +11,7 @@ import packageJson from '../package.json' assert { type: 'json' };
 import { downloadMessages } from './actions/downloadMessages.js';
 import { downloadSubscribers } from './actions/downloadSubscribers.js';
 import { getAdminChannels } from './actions/getAdminChannels.js';
+import { downloadTopics } from './actions/migrateToTopics/index.js';
 import logger from './utils/logger.js';
 
 const mapKeyToPrompt = (key: string, props = {}) => {
@@ -58,9 +60,20 @@ const main = async () => {
         },
     );
 
+    const cleanUp = async () => {
+        logger.info(`Shutting down gracefully...`);
+
+        await client?.disconnect();
+
+        process.exit(0);
+    };
+
+    process.on('SIGINT', cleanUp);
+    process.on('SIGTERM', cleanUp);
+
     await client.start({
         onError: (err) => logger.error('Error:', err),
-        password: async () => await input({ message: 'Enter your password (if required): ', required: true }),
+        password: async () => await input({ message: 'Enter your password (if required): ', required: false }),
         phoneCode: async () => await input({ message: 'Enter your phone code: ', required: true }),
         phoneNumber: async () => await input({ message: 'Enter your phone number: ', required: true }),
     });
@@ -71,17 +84,22 @@ const main = async () => {
         config.set('sessionId', sessionId);
     }
 
+    const [, , autoAction, channelId] = process.argv;
+
     try {
-        const action = await select({
-            choices: [
-                { name: 'Download Messages/Posts', value: 'downloadMessages' },
-                { name: 'Get Admin Channels', value: 'getAdminChannels' },
-                { name: 'Download Channel Subscribers', value: 'getSubscribers' },
-                { name: 'Log Out', value: 'logout' },
-            ],
-            default: 'downloadMessages',
-            message: 'What do you want to do?',
-        });
+        const action =
+            autoAction ||
+            (await select({
+                choices: [
+                    { name: 'Download Messages/Posts', value: 'downloadMessages' },
+                    { name: 'Get Admin Channels', value: 'getAdminChannels' },
+                    { name: 'Download Channel Subscribers', value: 'getSubscribers' },
+                    { name: 'Download Topics and Messages from a Supergroup', value: 'downloadTopics' },
+                    { name: 'Log Out', value: 'logout' },
+                ],
+                default: 'downloadMessages',
+                message: 'What do you want to do?',
+            }));
 
         if (action === 'downloadMessages') {
             const outputFile = await downloadMessages(client);
@@ -94,6 +112,10 @@ const main = async () => {
             logger.info('Fetching subscribers for channel...');
             const outputFile = await downloadSubscribers(client);
             logger.info(`Saved to ${outputFile}.`);
+        } else if (action === 'downloadTopics') {
+            logger.info('Fetching topics from supergroup...');
+            const outputFile = await downloadTopics(client, channelId);
+            logger.info(`Saved to ${outputFile}.`);
         } else if (action === 'logout') {
             logger.info('Logging out...');
             await client.invoke(new Api.auth.LogOut());
@@ -103,6 +125,7 @@ const main = async () => {
     } catch (err) {
         logger.error(err);
     } finally {
+        logger.info('Disconnecting gracefully');
         await client.disconnect();
     }
 };

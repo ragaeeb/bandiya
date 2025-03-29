@@ -1,9 +1,17 @@
 export type Message = {
+    chatId: string;
+    from: {
+        firstName?: string;
+        lastName?: string;
+        userId: string;
+        username?: string;
+    };
     id: number;
     mediaId?: string;
     mediaType?: string;
     quote?: string;
-    text: string;
+    replyToMessageId?: string;
+    text?: string;
     timestamp: number;
     type: MessageType;
 };
@@ -30,6 +38,9 @@ export type TelegramMessage = {
     };
     id: number;
     media?: {
+        document?: {
+            id: string;
+        };
         photo?: {
             id: string;
         };
@@ -43,11 +54,16 @@ export type TelegramMessage = {
     };
 };
 
-export type Thread = {
-    id: number;
+export interface Thread {
+    chatId: string;
+    createdAt: string;
+    lastMessageId: string;
     messages: Message[];
-    title: string;
-};
+    name: string;
+    threadId: string;
+    updatedAt: string;
+    userId: string;
+}
 
 export type User = {
     firstNames: Record<string, Date | null>;

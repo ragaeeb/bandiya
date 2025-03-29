@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { indexCacheUsersByThread, indexLegacyMessagesToUserId, indexUsernamesById } from './redisIndexer';
+import { indexCacheUsersByThread, indexIdsByUsername, indexLegacyMessagesToUserId } from './redisIndexer';
 
 describe('redisIndexer', () => {
     describe('indexLegacyMessagesToUser', () => {
@@ -45,41 +45,42 @@ describe('redisIndexer', () => {
 
     describe('indexUsernamesById', () => {
         it('should skip thread ids', () => {
-            const actual = indexUsernamesById({ t1234: '12345/111/5666' });
+            const actual = indexIdsByUsername({ t1234: '12345/111/5666' });
             expect(actual).toBeEmptyObject();
         });
 
         it('should skip user ids', () => {
-            const actual = indexUsernamesById({ u123: '12345/111/5666' });
+            const actual = indexIdsByUsername({ u123: '12345/111/5666' });
             expect(actual).toBeEmptyObject();
         });
 
         it('should skip invalid values', () => {
-            const actual = indexUsernamesById({ 111: '12345/111' });
+            const actual = indexIdsByUsername({ 111: '12345/111' });
             expect(actual).toBeEmptyObject();
         });
 
         it('should not add if it does not have username', () => {
-            const actual = indexUsernamesById({ 111: '12345/111/12345' });
+            const actual = indexIdsByUsername({ 111: '12345/111/12345' });
             expect(actual).toBeEmptyObject();
         });
 
         it('should keep unique values', () => {
-            const actual = indexUsernamesById({ 111: '1/111/1/a', 112: '1/112/1/b' });
+            const actual = indexIdsByUsername({ 111: '1/111/1/a', 112: '1/112/1/b' });
             expect(actual).toEqual({
-                1: ['a', 'b'],
+                a: '1',
+                b: '1',
             });
         });
 
         it('should remove duplicates', () => {
-            const actual = indexUsernamesById({ 111: '1/111/1/a', 112: '1/112/1/a' });
+            const actual = indexIdsByUsername({ 111: '1/111/1/a', 112: '1/112/1/a' });
             expect(actual).toEqual({
-                1: ['a'],
+                a: '1',
             });
         });
 
         it.skip('should process real data', async () => {
-            const result = indexUsernamesById(await Bun.file('redis.json').json());
+            const result = indexIdsByUsername(await Bun.file('redis.json').json());
             console.log('result', result);
         });
     });
