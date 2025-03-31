@@ -1,5 +1,3 @@
-import type { ChannelSubscriber } from '../../types.js';
-
 type CachedThread = {
     chatId: number;
     firstName?: string;
@@ -12,21 +10,8 @@ type RedisCache = Record<string, string>;
 const getValidLegacyKeys = (cache: RedisCache) => {
     return Object.keys(cache)
         .filter((key) => key.match(/^\d+$/))
+        .filter((key) => !cache[key].includes('1083498292')) // remove test account
         .filter((key) => cache[key].split('/').length > 2);
-};
-
-export const indexIdsByUsername = (cache: RedisCache) => {
-    const usernameToUserId: Record<string, string> = {};
-
-    for (const key of getValidLegacyKeys(cache)) {
-        const [, , userId, username] = cache[key].split('/');
-
-        if (username) {
-            usernameToUserId[username] = userId;
-        }
-    }
-
-    return usernameToUserId;
 };
 
 export const indexLegacyMessagesToUserId = (cache: RedisCache) => {
@@ -44,27 +29,49 @@ export const indexLegacyMessagesToUserId = (cache: RedisCache) => {
     return messageIdToUserId;
 };
 
-export const indexCacheUsersByThread = (cache: RedisCache) => {
-    const threadIdToUser: Record<string, ChannelSubscriber> = {};
+type Profile = {
+    firstNames: string[];
+    usernames: string[];
+};
+
+export const indexUserToProfile = (cache: RedisCache) => {
+    const userIdToProfile: Record<string, Profile> = {};
 
     Object.keys(cache)
         .filter((key) => key.startsWith('u'))
         .map((key) => JSON.parse(cache[key]) as CachedThread)
         .forEach((thread) => {
-            threadIdToUser[thread.threadId] = {
-                id: thread.chatId,
-                ...(thread.username && { username: thread.username }),
-                ...(thread.firstName && { firstName: thread.firstName }),
+            userIdToProfile[thread.chatId] = {
+                firstNames: thread.firstName ? [thread.firstName] : [],
+                usernames: thread.username ? [thread.username] : [],
             };
         });
 
-    return threadIdToUser;
+    getValidLegacyKeys(cache)
+        .map((key) => {
+            const [, , userId, username] = cache[key].split('/');
+            return [userId, username];
+        })
+        .filter(([, username]) => username)
+        .forEach(([userId, username]) => {
+            if (!userIdToProfile[userId]) {
+                userIdToProfile[userId] = { firstNames: [], usernames: [] };
+            }
+
+            userIdToProfile[userId].usernames.push(username);
+        });
+
+    Object.values(userIdToProfile).forEach((profile) => {
+        profile.firstNames = Array.from(new Set(profile.firstNames));
+        profile.usernames = Array.from(new Set(profile.usernames));
+    });
+
+    return userIdToProfile;
 };
 
 export const getIndexedDataFromCache = (cache: RedisCache) => {
     return {
         messageIdToUserId: indexLegacyMessagesToUserId(cache),
-        threadIdToUser: indexCacheUsersByThread(cache),
-        usernameToUserId: indexIdsByUsername(cache),
+        userIdToProfile: indexUserToProfile(cache),
     };
 };

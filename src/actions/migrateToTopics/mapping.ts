@@ -1,6 +1,6 @@
 import process from 'node:process';
 
-import type { Message, TelegramMessage, Thread } from './types.js';
+import type { SavedMessage, TelegramMessage, Thread } from './types.js';
 
 import { indexTelegramMessagesById } from './messageIndexer.js';
 import {
@@ -16,15 +16,18 @@ import {
 const adminIds = new Set([process.env.ADMIN_ID!]);
 const botIds = new Set([process.env.BOT_ID!]);
 
-export const mapTelegramMessage = (m: TelegramMessage): Message => {
+const mapTelegramMessage = (m: TelegramMessage): SavedMessage => {
     return {
-        id: m.id,
+        chatId: '', // this will be filled in later
+        from: { userId: (m.fwdFrom?.fromId?.userId || m.fromId?.userId)! },
+        id: m.id.toString(),
+        timestamp: new Date(m.date * 1000).toISOString(),
+        type: getMessageType(m, adminIds),
         ...(m.message && { text: m.message }),
-        timestamp: m.date,
+        ...(m.replyTo?.replyToMsgId && { replyToMessageId: m.replyTo?.replyToMsgId.toString() }),
         ...(m.replyTo?.quoteText && { quote: m.replyTo?.quoteText }),
         ...(m.media?.photo && { mediaId: m.media.photo.id, mediaType: 'photo' }),
         ...(m.media?.document && { mediaId: m.media.document.id, mediaType: 'document' }),
-        type: getMessageType(m, adminIds),
     };
 };
 
@@ -41,28 +44,42 @@ export const processMessagesFromLegacyGroup = (messages: TelegramMessage[], user
             console.log('Creating new thread for user that did not have a thread', message.id, userId);
 
             userIdToThread[userId!] = {
-                id: parseInt(userId),
+                createdAt: new Date(message.date * 1000).toISOString(),
+                lastMessageId: message.id.toString(),
                 messages: [],
-                title: `${userId}`,
+                name: `${userId}`,
+                threadId: userId,
+                updatedAt: new Date(message.date * 1000).toISOString(),
+                userId,
             };
         });
 
     userMessages.forEach((message) => {
-        const thread = userIdToThread[message.fwdFrom!.fromId!.userId!];
+        const userId = message.fwdFrom!.fromId!.userId!;
+        const thread = userIdToThread[userId];
+        console.log('userId', userId, 'message.id', message.id);
+
+        if (message.id === 414) {
+            console.log('message', message);
+        }
+
         thread.messages.push(mapTelegramMessage(message));
     });
 
     adminMessages
         .filter((message) => !isSoliloquy(message))
         .forEach((message) => {
+            console.log('processing', message.id);
             const userMessage = idToMessage[message.replyTo!.replyToMsgId!];
-            const thread = userIdToThread[userMessage.fwdFrom!.fromId!.userId!];
+            const userId = userMessage.fwdFrom!.fromId!.userId!;
+            const thread = userIdToThread[userId];
             thread.messages.push(mapTelegramMessage(message));
         });
 
     messages.filter(isForwardedFromChannel).forEach((message) => {
         const nextMessage = idToMessage[message.id + 1]; // the next message will probably be the user commenting on it
-        const thread = userIdToThread[nextMessage.fwdFrom!.fromId!.userId!];
+        const userId = nextMessage.fwdFrom!.fromId!.userId!;
+        const thread = userIdToThread[userId];
         thread.messages.push(mapTelegramMessage(message));
     });
 
@@ -70,7 +87,7 @@ export const processMessagesFromLegacyGroup = (messages: TelegramMessage[], user
 };
 
 export const indexMessagesByTopicId = (messages: TelegramMessage[]) => {
-    const threadIdToMessages: Record<string, Message[]> = {};
+    const threadIdToMessages: Record<string, SavedMessage[]> = {};
 
     messages.forEach((message) => {
         const threadId = (message.replyTo?.replyToTopId || message.replyTo?.replyToMsgId) as number;

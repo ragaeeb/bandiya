@@ -1,4 +1,6 @@
-export type Message = {
+export type MessageType = 'admin' | 'user';
+
+export type SavedMessage = {
     chatId: string;
     from: {
         firstName?: string;
@@ -6,19 +8,18 @@ export type Message = {
         userId: string;
         username?: string;
     };
-    id: number;
+    id: string;
     mediaId?: string;
     mediaType?: string;
     quote?: string;
     replyToMessageId?: string;
     text?: string;
-    timestamp: number;
+    timestamp: string;
     type: MessageType;
 };
 
-export type MessageType = 'admin' | 'user';
-
 export type TelegramForumTopic = {
+    date: number;
     id: number;
     title: string;
 };
@@ -55,18 +56,11 @@ export type TelegramMessage = {
 };
 
 export interface Thread {
-    chatId: string;
     createdAt: string;
-    lastMessageId: string;
-    messages: Message[];
+    lastMessageId?: string;
+    messages: SavedMessage[];
     name: string;
     threadId: string;
     updatedAt: string;
     userId: string;
 }
-
-export type User = {
-    firstNames: Record<string, Date | null>;
-    id: string;
-    usernames: Record<string, Date | null>;
-};

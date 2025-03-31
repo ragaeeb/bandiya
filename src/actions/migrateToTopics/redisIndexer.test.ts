@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { indexCacheUsersByThread, indexIdsByUsername, indexLegacyMessagesToUserId } from './redisIndexer';
+import { indexCacheUsersByThread, indexLegacyMessagesToUserId } from './redisIndexer';
 
 describe('redisIndexer', () => {
     describe('indexLegacyMessagesToUser', () => {
@@ -40,48 +40,6 @@ describe('redisIndexer', () => {
             });
 
             expect(actual).toEqual({ 4: '12345' });
-        });
-    });
-
-    describe('indexUsernamesById', () => {
-        it('should skip thread ids', () => {
-            const actual = indexIdsByUsername({ t1234: '12345/111/5666' });
-            expect(actual).toBeEmptyObject();
-        });
-
-        it('should skip user ids', () => {
-            const actual = indexIdsByUsername({ u123: '12345/111/5666' });
-            expect(actual).toBeEmptyObject();
-        });
-
-        it('should skip invalid values', () => {
-            const actual = indexIdsByUsername({ 111: '12345/111' });
-            expect(actual).toBeEmptyObject();
-        });
-
-        it('should not add if it does not have username', () => {
-            const actual = indexIdsByUsername({ 111: '12345/111/12345' });
-            expect(actual).toBeEmptyObject();
-        });
-
-        it('should keep unique values', () => {
-            const actual = indexIdsByUsername({ 111: '1/111/1/a', 112: '1/112/1/b' });
-            expect(actual).toEqual({
-                a: '1',
-                b: '1',
-            });
-        });
-
-        it('should remove duplicates', () => {
-            const actual = indexIdsByUsername({ 111: '1/111/1/a', 112: '1/112/1/a' });
-            expect(actual).toEqual({
-                a: '1',
-            });
-        });
-
-        it.skip('should process real data', async () => {
-            const result = indexIdsByUsername(await Bun.file('redis.json').json());
-            console.log('result', result);
         });
     });
 
@@ -130,8 +88,8 @@ describe('redisIndexer', () => {
             });
         });
 
-        it.skip('should process real data', async () => {
-            const result = indexCacheUsersByThread(await Bun.file('redis.json').json());
+        it.only('should process real data', async () => {
+            const result = indexCacheUsersByThread(await Bun.file('test/redis.json').json());
             console.log('result', result);
         });
     });
