@@ -2,16 +2,22 @@
 import { input, select } from '@inquirer/prompts';
 import welcome from 'cli-welcome';
 import Conf from 'conf';
-import { TelegramClient } from 'telegram';
-import { StringSession } from 'telegram/sessions';
-import { Api } from 'telegram/tl';
+import { Api, sessions, TelegramClient } from 'telegram';
 
-import packageJson from '../package.json' assert { type: 'json' };
+import packageJson from '../package.json' with { type: 'json' };
 import { downloadMessages } from './actions/downloadMessages.js';
 import { downloadSubscribers } from './actions/downloadSubscribers.js';
 import { getAdminChannels } from './actions/getAdminChannels.js';
 import logger from './utils/logger.js';
 
+const { StringSession } = sessions;
+
+/**
+ * Creates a prompt configuration object for the `@inquirer/prompts` library.
+ * @param key The key to use for the prompt.
+ * @param props Additional properties to add to the prompt configuration.
+ * @returns A prompt configuration object.
+ */
 const mapKeyToPrompt = (key: string, props = {}) => {
     return {
         key,
@@ -23,6 +29,10 @@ const mapKeyToPrompt = (key: string, props = {}) => {
     };
 };
 
+/**
+ * The main function of the application.
+ * It handles user authentication, displays a menu of actions, and executes the selected action.
+ */
 const main = async () => {
     welcome({
         bgColor: `#FADC00`,
@@ -51,7 +61,7 @@ const main = async () => {
 
     const client = new TelegramClient(
         new StringSession(config.get('sessionId') as string),
-        parseInt(config.get('apiId') as string),
+        parseInt(config.get('apiId') as string, 10),
         config.get('apiHash') as string,
         {
             connectionRetries: 5,
@@ -59,7 +69,7 @@ const main = async () => {
     );
 
     await client.start({
-        onError: (err) => logger.error('Error:', err),
+        onError: (err: any) => logger.error('Error:', err),
         password: async () => await input({ message: 'Enter your password (if required): ', required: true }),
         phoneCode: async () => await input({ message: 'Enter your phone code: ', required: true }),
         phoneNumber: async () => await input({ message: 'Enter your phone number: ', required: true }),

@@ -1,9 +1,12 @@
-import type { TelegramClient } from 'telegram';
+import { Api, type TelegramClient } from 'telegram';
 
-import { Api } from 'telegram/tl';
+import type { TelegramChannel } from '@/types.js';
 
-import { TelegramChannel } from '../types.js';
-
+/**
+ * Fetches a list of channels where the current user is an administrator.
+ * @param client The TelegramClient instance.
+ * @returns A promise that resolves to an array of `TelegramChannel` objects.
+ */
 export const getAdminChannels = async (client: TelegramClient) => {
     const adminChannels: TelegramChannel[] = [];
 

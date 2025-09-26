@@ -5,40 +5,71 @@
 ![GitHub License](https://img.shields.io/github/license/ragaeeb/bandiya)
 ![GitHub Release](https://img.shields.io/github/v/release/ragaeeb/bandiya)
 ![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue)
+![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)
+[![codecov](https://codecov.io/gh/ragaeeb/bandiya/graph/badge.svg?token=5XMFU6VOKI)](https://codecov.io/gh/ragaeeb/bandiya)
 
-A CLI for interacting with Telegram platform.
+A powerful CLI tool for interacting with the Telegram platform. `bandiya` allows you to perform various actions such as downloading messages, fetching subscriber lists, and managing channels where you have administrative privileges.
+
+## Features
+
+-   **Download Messages**: Securely download all messages from a specified Telegram channel and save them in a structured JSON format.
+-   **Download Subscribers**: Fetch a comprehensive list of all subscribers from a channel, using advanced search patterns to ensure maximum coverage.
+-   **Admin Channel Management**: Quickly view a list of all channels where you are an administrator, along with their participant counts.
+-   **Secure Authentication**: Your API credentials and session data are stored locally, ensuring your information remains private.
+-   **Interactive Prompts**: An easy-to-use interactive interface guides you through the necessary steps for each action.
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/ragaeeb/bandiya.git
-cd bandiya
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/ragaeeb/bandiya.git
+    cd bandiya
+    ```
 
-# Install dependencies
-bun install
-
-# Link the command globally (optional)
-```
+2.  **Install dependencies**:
+    ```bash
+    bun install
+    ```
 
 ## Usage
 
-```bash
-npm install -g bandiya
-```
+You can run `bandiya` using `npx`, `bunx`, or by installing it globally.
 
-Or
+### Using `npx`
 
 ```bash
 npx bandiya
 ```
 
-Or
+### Using `bunx`
 
 ```bash
 bunx bandiya
 ```
 
+### Global Installation
+
 ```bash
-bandiya [options] <directory> [<directory2> ...]
+npm install -g bandiya
+bandiya
 ```
+
+### Authentication
+
+The first time you run `bandiya`, you will be prompted to enter your Telegram `apiId` and `apiHash`. You can obtain these from [my.telegram.org](https://my.telegram.org). After entering your credentials, you will be asked for your phone number, a code sent to your Telegram account, and your password (if you have one set up).
+
+Your session ID will be saved locally, so you won't have to log in every time.
+
+### Available Actions
+
+Once authenticated, you will be presented with a menu of available actions:
+
+-   **Download Messages/Posts**: Prompts for a channel handle and downloads all messages, saving them to a JSON file.
+-   **Get Admin Channels**: Displays a table of all channels where you have administrative rights.
+-   **Download Channel Subscribers**: Prompts for a channel handle and downloads a list of all subscribers, saving them to a JSON file.
+-   **Log Out**: Logs you out of the current session and deletes the session ID.
+
+---
+
+*This project is built with TypeScript and uses the Bun runtime.*
+
