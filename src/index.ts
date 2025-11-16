@@ -8,26 +8,10 @@ import packageJson from '../package.json' with { type: 'json' };
 import { downloadMessages } from './actions/downloadMessages.js';
 import { downloadSubscribers } from './actions/downloadSubscribers.js';
 import { getAdminChannels } from './actions/getAdminChannels.js';
+import { mapKeyToPrompt } from './utils/prompts.js';
 import logger from './utils/logger.js';
 
 const { StringSession } = sessions;
-
-/**
- * Creates a prompt configuration object for the `@inquirer/prompts` library.
- * @param key The key to use for the prompt.
- * @param props Additional properties to add to the prompt configuration.
- * @returns A prompt configuration object.
- */
-const mapKeyToPrompt = (key: string, props = {}) => {
-    return {
-        key,
-        message: `Enter ${key}:`,
-        required: true,
-        transformer: (input: string) => input.trim(),
-        validate: (input: string) => (input ? true : `${key} is required.`),
-        ...props,
-    };
-};
 
 /**
  * The main function of the application.
@@ -44,7 +28,7 @@ const main = async () => {
 
     const config = new Conf({ projectName: packageJson.name });
 
-    const prompts = ['apiId', 'apiHash'].filter((key) => !config.has(key)).map(mapKeyToPrompt);
+    const prompts = ['apiId', 'apiHash'].filter((key) => !config.has(key)).map((key) => mapKeyToPrompt(key));
 
     for (const { key, ...prompt } of prompts) {
         const answer = await input(prompt);
