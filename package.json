@@ -1,7 +1,7 @@
 {
     "author": "Ragaeeb Haq",
     "bin": {
-        "bandiya": "dist/index.js"
+        "bandiya": "dist/index.mjs"
     },
     "bugs": {
         "url": "https://github.com/ragaeeb/bandiya/issues"
@@ -24,7 +24,8 @@
         "tsdown": "^0.16.4"
     },
     "engines": {
-        "bun": ">=1.2.22"
+        "bun": ">=1.3.2",
+        "node": ">=22.0.0"
     },
     "files": [
         "dist/*"
@@ -34,11 +35,10 @@
         "telegram"
     ],
     "license": "MIT",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "dist/index.mjs",
     "name": "bandiya",
     "scripts": {
-        "build": "bun run scripts/tsdown.ts",
+        "build": "tsdown",
         "format": "biome format --write .",
         "lint": "biome check --write .",
         "lint:ci": "biome ci",
@@ -46,5 +46,6 @@
     },
     "source": "src/index.ts",
     "type": "module",
+    "types": "dist/index.d.mts",
     "version": "1.1.0"
 }
