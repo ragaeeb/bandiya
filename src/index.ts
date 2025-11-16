@@ -1,4 +1,3 @@
-#!/usr/bin/env bun
 import { input, select } from '@inquirer/prompts';
 import welcome from 'cli-welcome';
 import Conf from 'conf';
@@ -8,8 +7,8 @@ import packageJson from '../package.json' with { type: 'json' };
 import { downloadMessages } from './actions/downloadMessages.js';
 import { downloadSubscribers } from './actions/downloadSubscribers.js';
 import { getAdminChannels } from './actions/getAdminChannels.js';
-import { mapKeyToPrompt } from './utils/prompts.js';
 import logger from './utils/logger.js';
+import { mapKeyToPrompt } from './utils/prompts.js';
 
 const { StringSession } = sessions;
 

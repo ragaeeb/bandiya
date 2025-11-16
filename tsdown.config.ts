@@ -1,14 +1,16 @@
-import { defineConfig } from 'tsdown';
+import { defineConfig } from 'tsdown/config';
 
 export default defineConfig({
-    entry: ['src/index.ts'],
-    format: ['esm'],
-    outDir: 'dist',
-    sourcemap: true,
+    banner: {
+        js: '#!/usr/bin/env node\n',
+    },
+    clean: true,
     dts: true,
-    minify: true,
-    target: 'node18',
-    external: ['bun', 'bun:*'],
-    treeshake: true,
-    outExtensions: () => ({ js: '.js', dts: '.d.ts' }),
+    entry: ['src/index.ts'],
+    format: 'esm',
+    minify: false,
+    outDir: 'dist',
+    platform: 'node',
+    sourcemap: true,
+    target: 'node22',
 });
