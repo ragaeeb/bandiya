@@ -12,11 +12,12 @@ A powerful CLI tool for interacting with the Telegram platform. `bandiya` allows
 
 ## Features
 
--   **Download Messages**: Securely download all messages from a specified Telegram channel and save them in a structured JSON format.
--   **Download Subscribers**: Fetch a comprehensive list of all subscribers from a channel, using advanced search patterns to ensure maximum coverage.
--   **Admin Channel Management**: Quickly view a list of all channels where you are an administrator, along with their participant counts.
--   **Secure Authentication**: Your API credentials and session data are stored locally, ensuring your information remains private.
--   **Interactive Prompts**: An easy-to-use interactive interface guides you through the necessary steps for each action.
+-   **Download Messages** (`downloadMessages`) – Securely download channel posts, capture useful metadata (views, edits, forwards), and persist them as a sorted JSON archive.
+-   **Download Subscribers** (`downloadSubscribers`) – Combine pattern-based lookups with fallback searches to build the most complete subscriber list possible, saving progress incrementally.
+-   **Admin Channel Management** (`getAdminChannels`) – Audit where you have administrative rights and inspect channel statistics in a single command.
+-   **Search Utilities** (`generateSearchPatterns`) – Produce comprehensive English and Arabic search prefixes that power subscriber discovery.
+-   **Prompt Helpers** (`mapKeyToPrompt`) – Consistent, validated CLI prompts that keep onboarding friction-free.
+-   **Secure Authentication** – API credentials and session tokens are stored locally using encrypted configuration, keeping your details private.
 
 ## Installation
 
@@ -68,6 +69,19 @@ Once authenticated, you will be presented with a menu of available actions:
 -   **Get Admin Channels**: Displays a table of all channels where you have administrative rights.
 -   **Download Channel Subscribers**: Prompts for a channel handle and downloads a list of all subscribers, saving them to a JSON file.
 -   **Log Out**: Logs you out of the current session and deletes the session ID.
+
+## Development
+
+-   `bun run build` – Run the `tsdown` CLI via `tsdown.config.ts` to emit the bundled CLI and its declaration files.
+-   `bun test` – Execute the unit test suite covering prompt helpers, channel discovery, subscriber mapping, and search pattern generation.
+-   `bun run src/index.ts` – Run the CLI in development mode without bundling.
+
+## Project Structure
+
+-   `src/actions/` – Core Telegram workflows (`downloadMessages`, `downloadSubscribers`, `getAdminChannels`).
+-   `src/utils/` – Supporting utilities such as search pattern generation, prompt factories, and logging.
+-   `scripts/tsdown.ts` – Thin Bun wrapper that shells out to the official `tsdown` CLI so CI/CD can simply run `bun run build`.
+-   `tsdown.config.ts` – Centralized `tsdown` configuration (entry points, sourcemaps, declaration output, bundler targets).
 
 ---
 

@@ -12,7 +12,7 @@ import { generateSearchPatterns } from '../utils/search.js';
  * @param user The `Api.User` object to map.
  * @returns A `ChannelSubscriber` object.
  */
-const mapParticipantToSubscriber = (user: Api.User): ChannelSubscriber => {
+export const mapParticipantToSubscriber = (user: Api.User): ChannelSubscriber => {
     return {
         ...(user.firstName && { firstName: user.firstName }),
         ...(user.lastName && { lastName: user.lastName }),
