@@ -12,7 +12,7 @@ A powerful CLI tool for interacting with the Telegram platform. `bandiya` allows
 
 ## Features
 
--   **Download Messages** (`downloadMessages`) – Securely download channel posts, capture useful metadata (views, edits, forwards), and persist them as a sorted JSON archive.
+-   **Download Messages** (`downloadMessages`) – Securely download channel posts or group chat messages (via handle or Peer ID) with support for standard or full canonical JSON export (thread IDs, reply headers, media, and raw entities).
 -   **Download Subscribers** (`downloadSubscribers`) – Combine pattern-based lookups with fallback searches to build the most complete subscriber list possible, saving progress incrementally.
 -   **Admin Channel Management** (`getAdminChannels`) – Audit where you have administrative rights and inspect channel statistics in a single command.
 -   **Search Utilities** (`generateSearchPatterns`) – Produce comprehensive English and Arabic search prefixes that power subscriber discovery.
@@ -65,7 +65,7 @@ Your session ID will be saved locally, so you won't have to log in every time.
 
 Once authenticated, you will be presented with a menu of available actions:
 
--   **Download Messages/Posts**: Prompts for a channel handle and downloads all messages, saving them to a JSON file.
+-   **Download Messages/Posts**: Prompts for a channel handle or group chat Peer ID (with an option to export full canonical JSON fields like thread ID) and downloads all messages, saving them to a JSON file.
 -   **Get Admin Channels**: Displays a table of all channels where you have administrative rights.
 -   **Download Channel Subscribers**: Prompts for a channel handle and downloads a list of all subscribers, saving them to a JSON file.
 -   **Log Out**: Logs you out of the current session and deletes the session ID.
